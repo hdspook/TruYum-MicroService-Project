@@ -8,10 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +25,8 @@ import com.akash.truyum.mainapp.model.Cart;
 import com.akash.truyum.mainapp.model.Menu;
 import com.akash.truyum.mainapp.model.Order;
 import com.akash.truyum.mainapp.repository.CartRepository;
+import com.akash.truyum.mainapp.service.JwtService;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 
 @Controller
@@ -39,13 +38,15 @@ public class YumController {
 	RestTemplate template;
 
 	// user details from service
-	
 
 	Integer userId = null;
 	String userRole = "USER";
 
 	@Autowired
 	CartRepository cartRepository;
+
+	@Autowired
+	private JwtService jwtService;
 
 	@Value("${url}")
 	String url;
@@ -63,29 +64,36 @@ public class YumController {
 //		User user = getUserDetails(request);
 //		userId = user.getUserId();
 		log.info("Entering the /find method in YumController");
-		Menu items[] = (template.getForEntity(url + "/find", Menu[].class).getBody());
+		HttpEntity<String> entity = getEntity();
+		ResponseEntity<Menu[]> output = template.exchange(url + "/find", HttpMethod.GET, entity, Menu[].class);
+
 		log.info("Finding the menu items from ");
-		List<Menu> menu = Arrays.asList(items);
+		List<Menu> menu = Arrays.asList(output.getBody());
 		model.addAttribute("menuItems", menu);
 		return "allMenuItems";
 	}
 
 	@GetMapping("/find/{id}")
 	public String showById(@PathVariable("id") Integer id, Model model) {
-		Menu menu = template.getForObject(url + "/find/" + id, Menu.class);
-		model.addAttribute("menu", menu);
+		HttpEntity<String> entity = getEntity();
+		ResponseEntity<Menu[]> menu = template.exchange(url + "/find/", HttpMethod.GET, entity, Menu[].class);
+		//Menu menu = template.getForObject(url + "/find/" + id, Menu.class);
+		System.out.println(menu);
+		model.addAttribute("menu", menu.getBody()[0]);
 		return "findOneItem";
 	}
 
 	@GetMapping("/addToCart/{Id}")
 	public String addingToCart(@PathVariable("Id") Integer id, Model model, Principal principal) {
-		//String authorizationHeader = request.getHeader("Authorization").substring(7);
+		// String authorizationHeader = request.getHeader("Authorization").substring(7);
 		userId = Integer.parseInt(principal.getName());
-		Menu menu = template.getForObject(url + "/find/" + id, Menu.class);
+		HttpEntity<String> entity = getEntity();
+		ResponseEntity<Menu[]> menu = template.exchange(url + "/find/", HttpMethod.GET, entity, Menu[].class);
+		//Menu menu = template.getForObject(url + "/find/" + id, Menu.class);
 		Cart cart = new Cart();
 		cart.setMenuId(id);
-		cart.setMenuItem(menu.getMenuItem());
-		cart.setPrice(menu.getPrice());
+		cart.setMenuItem(menu.getBody()[id-1].getMenuItem());
+		cart.setPrice(menu.getBody()[id-1].getPrice());
 		cart.setUserId(userId);
 		Cart saved = cartRepository.save(cart);
 		model.addAttribute("item", saved);
@@ -135,11 +143,32 @@ public class YumController {
 		order.setCart(allCartItems);
 		order.setUserId(userId);
 		order.setPrice(allCartItems.parallelStream().mapToDouble(i -> i.getPrice()).sum());
-
-		Order myOrder = template.postForObject("http://localhost:8102/order/checkout", order, Order.class);
+		HttpEntity<Order> entity = getEntityForCart(order);
+		//ResponseEntity<Order> myOrder = template.postForEntity("http://localhost:8102/order/checkout", order, entity, Order.class);
+		Order myOrder = template.postForObject("http://localhost:8102/order/checkout", entity, Order.class);
 		clearCart();
 		return myOrder.toString();
 
+	}
+
+	private HttpEntity<Order> getEntityForCart(Order order) {
+		HttpHeaders http = new HttpHeaders();
+		String token = null;
+		if (jwtService.getJwt() != null)
+			token = jwtService.getJwt();
+		http.add("Authorization", "Bearer " + token);
+		HttpEntity<Order> entity = new HttpEntity<>(order,http);
+		return entity;
+	}
+
+	private HttpEntity<String> getEntity() {
+		HttpHeaders http = new HttpHeaders();
+		String token = null;
+		if (jwtService.getJwt() != null)
+			token = jwtService.getJwt();
+		http.add("Authorization", "Bearer " + token);
+		HttpEntity<String> entity = new HttpEntity<String>(http);
+		return entity;
 	}
 
 }

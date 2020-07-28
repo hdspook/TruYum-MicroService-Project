@@ -16,5 +16,5 @@ public interface AuthServiceProxy {
 
 	@RequestMapping(value = "/checkToken", consumes = {
 			MediaType.APPLICATION_JSON_VALUE }, method = RequestMethod.POST)
-	public Boolean checkToken(String theToken);
+	public Boolean checkToken(String[] theToken);
 }

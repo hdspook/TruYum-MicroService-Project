@@ -17,9 +17,9 @@ public class RequestAuthenticationController {
 	private JwtUtil theTokenUtil;
 
 	@PostMapping("/checkToken")
-	public Boolean checkToken(@RequestBody String theToken) {
+	public Boolean checkToken(@RequestBody String[] theTokenDetails) {
 
-		return theTokenUtil.validateToken(theToken, "guest");
+		return theTokenUtil.validateToken(theTokenDetails[0], theTokenDetails[1]);
 	}
 
 }

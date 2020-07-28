@@ -1,0 +1,31 @@
+package com.truyum.orderservice.filters;
+
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import lombok.extern.apachecommons.CommonsLog;
+
+@Configuration
+@CommonsLog
+public class JwtRequestFilter extends OncePerRequestFilter {
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws ServletException, IOException {
+		System.out.println("Entering doFilterInternal method");
+		final String authorizationHeader = request.getHeader("Authorization");
+
+		String username = null;
+		String jwt = null;
+
+		chain.doFilter(request, response);
+	}
+
+}

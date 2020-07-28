@@ -45,8 +45,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			System.out.println("Entered And Filtered");
 			System.out.println(authorizationHeader.substring(7));
 			jwt = authorizationHeader.substring(7);
-
-			Boolean isValid = theAuthenticationProxy.checkToken(jwt);
+			String[] theDetails = {jwt, SecurityContextHolder.getContext().getAuthentication().getName()};
+			Boolean isValid = theAuthenticationProxy.checkToken(theDetails);
 			System.out.println(isValid + " Token Is Valid");
 
 			if (!isValid) {
