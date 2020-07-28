@@ -1,0 +1,22 @@
+package com.akash.truyum.mainapp.proxy;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Configuration
+@FeignClient(name = "truyum-auth-server", url = "localhost:8105/api")
+public interface AuthServiceProxy {
+
+	@RequestMapping(value = "/authenticate", consumes = {
+			MediaType.APPLICATION_JSON_VALUE }, method = RequestMethod.POST)
+	public String createAuthenticationToken(String theUserName);
+
+	@RequestMapping(value = "/checkToken", consumes = {
+			MediaType.APPLICATION_JSON_VALUE }, method = RequestMethod.POST)
+	public Boolean checkToken(String theToken);
+}

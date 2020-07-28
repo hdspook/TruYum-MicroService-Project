@@ -1,0 +1,7 @@
+package com.akash.truyum.mainapp.controller;
+
+
+@Controller
+public class TestController {
+
+}

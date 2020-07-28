@@ -1,0 +1,31 @@
+package com.akash.truyum.mainapp.controller;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.akash.truyum.mainapp.proxy.AuthServiceProxy;
+
+@Controller
+public class TestController {
+
+	@Autowired
+	private AuthServiceProxy theAuthProy;
+
+	@GetMapping("/")
+	@ResponseBody
+	public String testing(HttpServletResponse response) {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		String token = theAuthProy.createAuthenticationToken(username);
+		response.setHeader("Authorization", "Bearer " + token);
+		
+		return "Hello User";
+
+	}
+
+}

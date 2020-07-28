@@ -1,0 +1,59 @@
+package com.akash.truyum.mainapp.filters;
+
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.akash.truyum.mainapp.proxy.AuthServiceProxy;
+import com.akash.truyum.mainapp.service.JwtService;
+
+import lombok.extern.apachecommons.CommonsLog;
+
+@Configuration
+@CommonsLog
+public class JwtRequestFilter extends OncePerRequestFilter {
+
+	@Autowired
+	private AuthServiceProxy theAuthenticationProxy;
+
+	@Autowired
+	private JwtService jwtService;
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws ServletException, IOException {
+		log.info("Entering doFilterInternal method");
+		String authorizationHeader = request.getHeader("Authorization");
+
+		String jwt = null;
+
+		if (authorizationHeader == null && jwtService.getJwt() != null) {
+
+			authorizationHeader = "Bearer " + jwtService.getJwt();
+		}
+		
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")
+				&& SecurityContextHolder.getContext().getAuthentication() != null) {
+			System.out.println("Entered And Filtered");
+			System.out.println(authorizationHeader.substring(7));
+			jwt = authorizationHeader.substring(7);
+
+			Boolean isValid = theAuthenticationProxy.checkToken(jwt);
+
+			if (!isValid) {
+				throw new RuntimeException("Jwt is Not Valid");
+			}
+
+		}
+		chain.doFilter(request, response);
+	}
+
+}

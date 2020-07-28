@@ -1,0 +1,6 @@
+package com.akash.truyum.mainapp.proxy;
+
+
+public interface AuthServiceProxy {
+
+}

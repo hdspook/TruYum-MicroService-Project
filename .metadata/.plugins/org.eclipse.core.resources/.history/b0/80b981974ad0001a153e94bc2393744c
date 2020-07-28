@@ -1,0 +1,5 @@
+#Setting application name
+spring.application.name=truyum-auth-server
+
+#Setting port number
+server.port=8104

@@ -1,0 +1,28 @@
+package com.akash.truyum.mainapp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.akash.truyum.mainapp.proxy.AuthServiceProxy;
+
+@Controller
+public class TestController {
+
+	@Autowired
+	private AuthServiceProxy theAuthProy;
+
+	@GetMapping("/")
+	public String testing() {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		//Object password = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+		System.out.println(username);
+
+		String token = theAuthProy.createAuthenticationToken(username);
+		return token;
+
+	}
+
+}

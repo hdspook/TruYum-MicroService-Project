@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;SecurityConfig.java&apos; to &apos;YumApplication/src/main/java/com.akash.truyum.mainapp.config&apos;&#x0D;&#x0A;- Original project: &apos;truyum-auth-service&apos;&#x0D;&#x0A;- Destination element: &apos;YumApplication/src/main/java/com.akash.truyum.mainapp.config&apos;&#x0D;&#x0A;- Original element: &apos;com.integration.config.SecurityConfig.java&apos;" description="Copy compilation unit" destination="=YumApplication/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.akash.truyum.mainapp.config" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.integration.config{SecurityConfig.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1595883881188" units="1" version="1.0"/>
+</session>

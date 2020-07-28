@@ -1,0 +1,30 @@
+package com.integration.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.integration.util.JwtUtil;
+
+@RestController
+@RequestMapping("/api")
+public class LoginController {
+
+	@Autowired
+	private JwtUtil theJwtTokenUtil;
+
+	//@PostMapping("/authenticate")
+	@RequestMapping(value = "properties", consumes = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+	public String createAuthenticationToken(@RequestBody JsonNode theDetails){
+		System.out.println("Hello There Auth SErvice");
+		final String jwt = theJwtTokenUtil.generateToken(SecurityContextHolder.getContext().getAuthentication().getName());
+		return jwt;
+
+	}
+
+}
